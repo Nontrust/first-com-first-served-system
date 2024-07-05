@@ -10,11 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ApplyServiceImpl implements ApplyService {
     private final CouponReader couponReader;
+    private final Long TARGETED_COUPON_ID = 1L;
 
     @Override
     @Transactional
     public void apply(Long userId) {
-        long count = couponReader.count();
+        long count = couponReader.count(TARGETED_COUPON_ID);
         if(count > 100){
             return;
         }

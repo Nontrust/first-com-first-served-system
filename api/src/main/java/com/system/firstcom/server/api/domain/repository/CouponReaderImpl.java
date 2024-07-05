@@ -10,6 +10,7 @@ import java.util.Optional;
 @Component
 public class CouponReaderImpl implements CouponReader {
     private final CouponRepository repository;
+    private final CouponCountRepository couponCountRepository;
 
     @Override
     public Optional<Coupon> findById(Long id) {
@@ -17,8 +18,8 @@ public class CouponReaderImpl implements CouponReader {
     }
 
     @Override
-    public long count() {
-        return repository.count();
+    public long count(Long id) {
+        return couponCountRepository.increment(id);
     }
 
     @Override
