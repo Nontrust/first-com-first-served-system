@@ -7,15 +7,13 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.function.Consumer;
 import java.util.stream.LongStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,17 +30,22 @@ class ApplyServiceTest {
     @Autowired
     private CouponRepository couponRepository;
 
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
     private final long TEST_USER_ID = 1L;
 
     @BeforeEach
     public void 테스트_전(){
-        // TODO
+        redisTemplate.getConnectionFactory()
+                .getConnection().flushAll();
     }
 
     @AfterEach
     public void 테스트_후(){
         /* 테스트간 간섭이 없도록 테스트 데이터를 지웁니다. */
         couponRepository.deleteAll();
+
     }
     
     @Test
@@ -56,22 +59,11 @@ class ApplyServiceTest {
     }
 
     @Test
-    @Timeout(8)
-    @Transactional
+    @Timeout(10)
+    // TODO : race Condition!!
     public void 백번_응모() throws InterruptedException {
-
-        ConcurrentLinkedQueue<Runnable> runnables = LongStream
-                .rangeClosed(1L,100L)
-                .mapToObj(userId ->
-                        (Runnable) ()
-                                -> applyService.apply(userId)
-                )
-                .collect(Collectors.toCollection(ConcurrentLinkedQueue::new));
-
-
-
-        공통_서비스_테스트_멀티_스레드에서(runnables);
-
+        Consumer<Long> consumer = (Long l) -> applyService.apply(l);
+        공통_서비스_테스트_멀티_스레드에서(consumer, 100);
 
         long count = couponRepository.count();
 
@@ -79,26 +71,19 @@ class ApplyServiceTest {
 
     }
 
-
-
-    @Transactional
-    protected void 공통_서비스_테스트_멀티_스레드에서(ConcurrentLinkedQueue<Runnable> runnables) throws InterruptedException {
-        int threadCount = 100;
+    protected void 공통_서비스_테스트_멀티_스레드에서(Consumer<Long> consumer, int threadCount) throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(32);
         CountDownLatch latch = new CountDownLatch(threadCount);
 
-        IntStream.range(0, threadCount)
+        LongStream.range(0, threadCount)
                 .forEach( i -> {
                     executorService.execute(() -> {
-                        if(!runnables.isEmpty()){
-                            log.warn("현재 스레드 {}", Thread.currentThread().getId());
-                            runnables.poll().run();
-                        }
+                        log.warn("현재 스레드 {}", Thread.currentThread().getId());
+                        consumer.accept(i);
                     });
                 });
         latch.await();
         executorService.shutdown();
-
     }
 
     private void 공통_서비스_테스트 (List<Runnable> runnables) {

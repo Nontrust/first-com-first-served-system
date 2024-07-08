@@ -10,3 +10,5 @@ spring:
     url: jdbc:mysql://127.0.0.1:53306/coupon_example?serverTimezone=Asia/Seoul
     username: root
     password: 1234
+    hikari:
+      maximum-pool-size: 100
