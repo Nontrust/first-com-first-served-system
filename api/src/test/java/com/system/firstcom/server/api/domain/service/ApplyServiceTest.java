@@ -37,15 +37,13 @@ class ApplyServiceTest {
 
     @BeforeEach
     public void 테스트_전(){
-        redisTemplate.getConnectionFactory()
-                .getConnection().flushAll();
     }
 
     @AfterEach
     public void 테스트_후(){
         /* 테스트간 간섭이 없도록 테스트 데이터를 지웁니다. */
         couponRepository.deleteAll();
-
+        redisTemplate.delete("coupon:count:1");
     }
     
     @Test
@@ -78,8 +76,13 @@ class ApplyServiceTest {
         LongStream.range(0, threadCount)
                 .forEach( i -> {
                     executorService.execute(() -> {
-                        log.warn("현재 스레드 {}", Thread.currentThread().getId());
-                        consumer.accept(i);
+                        try {
+                            log.warn("현재 스레드 {}", Thread.currentThread().getId());
+                            log.warn("현재 count {}", i);
+                            consumer.accept(i);
+                        } finally {
+                            latch.countDown();  // latch count를 감소시킵니다.
+                        }
                     });
                 });
         latch.await();
