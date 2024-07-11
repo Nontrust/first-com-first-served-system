@@ -1,4 +1,4 @@
-package com.system.firstcom.server.api.domain.entity;
+package com.system.firstcom.server.api.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

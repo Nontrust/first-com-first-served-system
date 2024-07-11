@@ -1,4 +1,4 @@
-package com.system.firstcom.server.api.domain.service;
+package com.system.firstcom.server.api.service;
 
 public interface ApplyService {
     /**

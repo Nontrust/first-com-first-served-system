@@ -1,6 +1,7 @@
 package com.system.firstcom.server.api.domain.service;
 
-import com.system.firstcom.server.api.domain.repository.CouponRepository;
+import com.system.firstcom.server.api.repository.CouponRepository;
+import com.system.firstcom.server.api.service.ApplyServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
