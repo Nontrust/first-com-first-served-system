@@ -1,4 +1,4 @@
-package com.system.firstcom.server.api.domain.repository;
+package com.system.firstcom.server.api.repository;
 
 import com.system.firstcom.server.api.domain.entity.Coupon;
 import lombok.RequiredArgsConstructor;

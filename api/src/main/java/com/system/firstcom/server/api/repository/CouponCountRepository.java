@@ -1,4 +1,4 @@
-package com.system.firstcom.server.api.domain.repository;
+package com.system.firstcom.server.api.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
