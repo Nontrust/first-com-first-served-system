@@ -19,6 +19,6 @@ public class ApplyServiceImpl implements ApplyService {
         }
 
         Coupon coupon = Coupon.of(userId);
-        couponReader.save(coupon);
+        couponReader.create(userId);
     }
 }

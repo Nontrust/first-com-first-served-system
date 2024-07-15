@@ -7,4 +7,5 @@ public interface CouponReader {
     Optional<Coupon> findById(Long id);
     long count(Long id);
     Coupon save(Coupon coupon);
+    void create(Long id);
 }

@@ -59,7 +59,6 @@ class ApplyServiceTest {
 
     @Test
     @Timeout(10)
-    // TODO : race Condition!!
     public void 백번_응모() throws InterruptedException {
         Consumer<Long> consumer = (Long l) -> applyService.apply(l);
         공통_서비스_테스트_멀티_스레드에서(consumer, 100);
@@ -67,7 +66,6 @@ class ApplyServiceTest {
         long count = couponRepository.count();
 
         assertEquals(count, 100);
-
     }
 
     protected void 공통_서비스_테스트_멀티_스레드에서(Consumer<Long> consumer, int threadCount) throws InterruptedException {
