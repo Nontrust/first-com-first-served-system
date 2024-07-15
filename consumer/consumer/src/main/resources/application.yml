@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: first-com-first-served-system-consumer
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:53306/coupon_example?serverTimezone=Asia/Seoul
+    username: root
+    password: 1234
+    hikari:
+      maximum-pool-size: 100
