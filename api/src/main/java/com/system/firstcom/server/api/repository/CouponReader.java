@@ -6,6 +6,7 @@ import java.util.Optional;
 public interface CouponReader {
     Optional<Coupon> findById(Long id);
     long count(Long id);
+    Long apply(Long userId);
     Coupon save(Coupon coupon);
     void create(Long id);
 }

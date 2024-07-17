@@ -13,6 +13,11 @@ public class ApplyServiceImpl implements ApplyService {
 
     @Override
     public void apply(Long userId) {
+        Long apply = couponReader.apply(userId);
+        if(apply != 1){
+            return;
+        }
+
         long count = couponReader.count(TARGETED_COUPON_ID);
         if(count > 100){
             return;

@@ -63,9 +63,27 @@ class ApplyServiceTest {
         Consumer<Long> consumer = (Long l) -> applyService.apply(l);
         공통_서비스_테스트_멀티_스레드에서(consumer, 100);
 
+
+        Thread.sleep(1000);
         long count = couponRepository.count();
 
         assertEquals(count, 100);
+    }
+
+    @Test
+    @Timeout(10)
+    public void 한명당_한개의_쿠폰이_발급_되는지() throws InterruptedException {
+        Long testUserId = 1L;
+        Consumer<Long> consumer = (Long l) -> applyService.apply(l);
+
+        하나의_아이디_서비스_테스트_멀티_스레드에서(consumer, 100, testUserId);
+
+
+        Thread.sleep(1000);
+        long count = couponRepository.count();
+
+        assertEquals(count, 1);
+
     }
 
     protected void 공통_서비스_테스트_멀티_스레드에서(Consumer<Long> consumer, int threadCount) throws InterruptedException {
@@ -73,17 +91,29 @@ class ApplyServiceTest {
         CountDownLatch latch = new CountDownLatch(threadCount);
 
         LongStream.range(0, threadCount)
-                .forEach( i -> {
-                    executorService.execute(() -> {
-                        try {
-                            log.warn("현재 스레드 {}", Thread.currentThread().getId());
-                            log.warn("현재 count {}", i);
-                            consumer.accept(i);
-                        } finally {
-                            latch.countDown();  // latch count를 감소시킵니다.
-                        }
-                    });
-                });
+                .forEach( i -> executorService.execute(() -> {
+                    try {
+                        consumer.accept(i);
+                    } finally {
+                        latch.countDown();  // latch count를 감소시킵니다.
+                    }
+                }));
+        latch.await();
+        executorService.shutdown();
+    }
+
+    protected void 하나의_아이디_서비스_테스트_멀티_스레드에서(Consumer<Long> consumer, int threadCount, Long id) throws InterruptedException {
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        LongStream.range(0, threadCount)
+                .forEach( i -> executorService.execute(() -> {
+                    try {
+                        consumer.accept(id);
+                    } finally {
+                        latch.countDown();  // latch count를 감소시킵니다.
+                    }
+                }));
         latch.await();
         executorService.shutdown();
     }

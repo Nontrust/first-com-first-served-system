@@ -13,6 +13,7 @@ public class CouponReaderImpl implements CouponReader {
     private final CouponRepository repository;
     private final CouponCountRepository couponCountRepository;
     private final CouponCreateProducer couponCreateProducer;
+    private final AppliedUserRepository appliedUserRepository;
 
     @Override
     public Optional<Coupon> findById(Long id) {
@@ -22,6 +23,11 @@ public class CouponReaderImpl implements CouponReader {
     @Override
     public long count(Long id) {
         return couponCountRepository.increment(id);
+    }
+
+    @Override
+    public Long apply(Long userId){
+        return appliedUserRepository.add(userId);
     }
 
     @Override
